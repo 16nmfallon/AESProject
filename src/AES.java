@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -32,7 +33,6 @@ public class AES {
         String keyString = arrayToString(key);
         System.out.println("round[0].input: " + plaintextString);
         System.out.println("round[0].k_sch: " + keyString);
-        //System.out.println("round[ 1].start: " + xorString(plaintextString, keyString));
         String[] currentText = xorString(plaintextString, keyString);
         for (int i = 1; i <= 10; i++) {
             System.out.println("round[" + i + "].start: " + arrayToString(currentText));
@@ -40,6 +40,7 @@ public class AES {
             System.out.println("round[" + i + "].s_box: " + arrayToString(currentText));
             currentText = rowSubstitution(currentText);
             System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
+            currentText = columnMultiplication(currentText);
 
         }
 
@@ -94,5 +95,63 @@ public class AES {
         currentText[14] = temp[6];
         currentText[15] = temp[11];
         return currentText;
+    }
+
+    private static String[] columnMultiplication(String[] currentText) {
+        String[] temp = Arrays.copyOf(currentText, 16);
+        int hex1 = 0x02 * Integer.decode(String.format("0x%s", temp[0]));
+        String binary1 = Integer.toBinaryString(hex1);
+        int hex2 = (0x02 * Integer.decode(String.format("0x%s", temp[1]))) ^ Integer.decode(String.format("0x%s", temp[1]));
+        String binary2 = Integer.toBinaryString(hex2);
+        int hex3 = Integer.decode(String.format("0x%s", temp[2]));
+        String binary3 = Integer.toBinaryString(hex3);
+        int hex4 = Integer.decode(String.format("0x%s", temp[3]));
+        String binary4 = Integer.toBinaryString(hex4);
+        StringBuilder binaryResult = new StringBuilder();
+        if ((binary1.charAt(0) + binary2.charAt(0) + binary3.charAt(0) + binary4.charAt(0)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(1) + binary2.charAt(1) + binary3.charAt(1) + binary4.charAt(1)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(2) + binary2.charAt(2) + binary3.charAt(2) + binary4.charAt(2)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(3) + binary2.charAt(3) + binary3.charAt(3) + binary4.charAt(3)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(4) + binary2.charAt(4) + binary3.charAt(4) + binary4.charAt(4)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(5) + binary2.charAt(5) + binary3.charAt(5) + binary4.charAt(5)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(6) + binary2.charAt(6) + binary3.charAt(6) + binary4.charAt(6)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        if ((binary1.charAt(7) + binary2.charAt(7) + binary3.charAt(7) + binary4.charAt(7)) % 2 == 0) {
+            binaryResult.append('0');
+        } else {
+            binaryResult.append('1');
+        }
+        String finalBinaryResult = binaryResult.toString();
+        int decimal = Integer.parseInt(finalBinaryResult,2);
+        String hexString = Integer.toString(decimal,16);
+        currentText[0] = hexString;
+        return temp;
     }
 }
