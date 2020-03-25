@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class AES {
@@ -37,6 +38,8 @@ public class AES {
             System.out.println("round[" + i + "].start: " + arrayToString(currentText));
             currentText = sBoxSubstitution(currentText);
             System.out.println("round[" + i + "].s_box: " + arrayToString(currentText));
+            currentText = rowSubstitution(currentText);
+            System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
 
         }
 
@@ -76,4 +79,20 @@ public class AES {
         return currentText;
     }
 
+    private static String[] rowSubstitution(String[] currentText) {
+        String[] temp = Arrays.copyOf(currentText, 16);
+        currentText[1] = temp[5];
+        currentText[2] = temp[10];
+        currentText[3] = temp[15];
+        currentText[5] = temp[9];
+        currentText[6] = temp[14];
+        currentText[7] = temp[3];
+        currentText[9] = temp[13];
+        currentText[10] = temp[2];
+        currentText[11] = temp[7];
+        currentText[13] = temp[1];
+        currentText[14] = temp[6];
+        currentText[15] = temp[11];
+        return currentText;
+    }
 }
