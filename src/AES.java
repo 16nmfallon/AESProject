@@ -23,7 +23,10 @@ public class AES {
             put("d0", "70"); put("d1", "3e"); put("d2", "b5"); put("d3", "66"); put("d4", "48"); put("d5", "03"); put("d6", "f6"); put("d7", "0e"); put("d8", "61"); put("d9", "35"); put("da", "57"); put("db", "b9"); put("dc", "86"); put("dd", "c1"); put("de", "1d"); put("df", "9e");
             put("e0", "e1"); put("e1", "f8"); put("e2", "98"); put("e3", "11"); put("e4", "69"); put("e5", "d9"); put("e6", "8e"); put("e7", "94"); put("e8", "9b"); put("e9", "1e"); put("ea", "87"); put("eb", "e9"); put("ec", "ce"); put("ed", "55"); put("ee", "28"); put("ef", "df");
             put("f0", "8c"); put("f1", "a1"); put("f2", "89"); put("f3", "0d"); put("f4", "bf"); put("f5", "e6"); put("f6", "42"); put("f7", "68"); put("f8", "41"); put("f9", "99"); put("fa", "2d"); put("fb", "0f"); put("fc", "b0"); put("fd", "54"); put("fe", "bb"); put("ff", "16");
-        }};
+        }
+    };
+
+    public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
 
     public static void main(String[] args) {
         String[] plaintext = {"00", "11", "22", "33", "44", "55", "66", "77", "88", "99", "aa", "bb", "cc", "dd", "ee", "ff"};
@@ -41,6 +44,7 @@ public class AES {
             currentText = rowSubstitution(currentText);
             System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
             currentText = columnMultiplication(currentText);
+            System.out.println("round][" + i + "].m_col: " + arrayToString(currentText));
 
         }
 
@@ -101,61 +105,209 @@ public class AES {
 
     private static String[] columnMultiplication(String[] currentText) {
         String[] temp = Arrays.copyOf(currentText, 16);
-        int hex1 = 0x02 * Integer.decode(String.format("0x%s", temp[0]));
-        String binary1 = Integer.toBinaryString(hex1);
-        int hex2 = (0x02 * Integer.decode(String.format("0x%s", temp[1]))) ^ Integer.decode(String.format("0x%s", temp[1]));
-        String binary2 = Integer.toBinaryString(hex2);
-        int hex3 = Integer.decode(String.format("0x%s", temp[2]));
-        String binary3 = Integer.toBinaryString(hex3);
-        int hex4 = Integer.decode(String.format("0x%s", temp[3]));
-        String binary4 = Integer.toBinaryString(hex4);
-        StringBuilder binaryResult = new StringBuilder();
-        if ((binary1.charAt(0) + binary2.charAt(0) + binary3.charAt(0) + binary4.charAt(0)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
+
+        for (int i = 0; i < 16; i++) {
+            String binary1 = "";
+            String binary2 = "";
+            String binary3 = "";
+            String binary4 = "";
+            int multiplier1 = 0;
+            int multiplier2 = 0;
+            int multiplier3 = 0;
+            int multiplier4 = 0;
+            // Setting the right multiplier for the multiplication matrix.
+            if (i % 4 == 0) {
+                multiplier1 = multiplicationMatrix[0][0];
+                multiplier2 = multiplicationMatrix[0][1];
+                multiplier3 = multiplicationMatrix[0][2];
+                multiplier4 = multiplicationMatrix[0][3];
+            }
+            else if (i % 4 == 1) {
+                multiplier1 = multiplicationMatrix[1][0];
+                multiplier2 = multiplicationMatrix[1][1];
+                multiplier3 = multiplicationMatrix[1][2];
+                multiplier4 = multiplicationMatrix[1][3];
+            }
+            else if (i % 4 == 2) {
+                multiplier1 = multiplicationMatrix[2][0];
+                multiplier2 = multiplicationMatrix[2][1];
+                multiplier3 = multiplicationMatrix[2][2];
+                multiplier4 = multiplicationMatrix[2][3];
+            }
+            else {
+                multiplier1 = multiplicationMatrix[3][0];
+                multiplier2 = multiplicationMatrix[3][1];
+                multiplier3 = multiplicationMatrix[3][2];
+                multiplier4 = multiplicationMatrix[3][3];
+            }
+            String matrixHex1 = "";
+            String matrixHex2 = "";
+            String matrixHex3 = "";
+            String matrixHex4 = "";
+            // Setting the number in the matrix that needs to be multiplied
+            if (i < 4) {
+                matrixHex1 = temp[0];
+                matrixHex2 = temp[1];
+                matrixHex3 = temp[2];
+                matrixHex4 = temp[3];
+            }
+            else if (i < 8) {
+                matrixHex1 = temp[4];
+                matrixHex2 = temp[5];
+                matrixHex3 = temp[6];
+                matrixHex4 = temp[7];
+            }
+            else if (i < 12) {
+                matrixHex1 = temp[8];
+                matrixHex2 = temp[9];
+                matrixHex3 = temp[10];
+                matrixHex4 = temp[11];
+            }
+            else {
+                matrixHex1 = temp[12];
+                matrixHex2 = temp[13];
+                matrixHex3 = temp[14];
+                matrixHex4 = temp[15];
+            }
+
+            // computes the correct binary number based on the hex and the multiplier that were passed in.
+            binary1 = computeBinary(multiplier1, matrixHex1);
+            binary2 = computeBinary(multiplier2, matrixHex2);
+            binary3 = computeBinary(multiplier3, matrixHex3);
+            binary4 = computeBinary(multiplier4, matrixHex4);
+
+            // Adds on extra 0's in the front of the strings if it is less than 8 digits.
+            StringBuilder sb1 = new StringBuilder(binary1);
+            while (sb1.length() < 8) {
+                sb1.insert(0, "0");
+            }
+            binary1 = sb1.toString();
+
+            StringBuilder sb2 = new StringBuilder(binary2);
+            while (sb2.length() < 8) {
+                sb2.insert(0, "0");
+            }
+            binary2 = sb2.toString();
+
+            StringBuilder sb3 = new StringBuilder(binary3);
+            while (sb3.length() < 8) {
+                sb3.insert(0, "0");
+            }
+            binary3 = sb3.toString();
+
+            StringBuilder sb4 = new StringBuilder(binary4);
+            while (sb4.length() < 8) {
+                sb4.insert(0, "0");
+            }
+            binary4 = sb4.toString();
+
+            // Does the xor operation without the carry over bit.
+            StringBuilder binaryResult = new StringBuilder();
+            if ((binary1.charAt(0) + binary2.charAt(0) + binary3.charAt(0) + binary4.charAt(0)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(1) + binary2.charAt(1) + binary3.charAt(1) + binary4.charAt(1)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(2) + binary2.charAt(2) + binary3.charAt(2) + binary4.charAt(2)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(3) + binary2.charAt(3) + binary3.charAt(3) + binary4.charAt(3)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(4) + binary2.charAt(4) + binary3.charAt(4) + binary4.charAt(4)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(5) + binary2.charAt(5) + binary3.charAt(5) + binary4.charAt(5)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(6) + binary2.charAt(6) + binary3.charAt(6) + binary4.charAt(6)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(7) + binary2.charAt(7) + binary3.charAt(7) + binary4.charAt(7)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            // Converts the binary back to hex and stores it into the main array.
+            String finalBinaryResult = binaryResult.toString();
+            int decimal = Integer.parseInt(finalBinaryResult,2);
+            String hexString = Integer.toString(decimal,16);
+            currentText[i] = hexString;
         }
-        if ((binary1.charAt(1) + binary2.charAt(1) + binary3.charAt(1) + binary4.charAt(1)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(2) + binary2.charAt(2) + binary3.charAt(2) + binary4.charAt(2)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(3) + binary2.charAt(3) + binary3.charAt(3) + binary4.charAt(3)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(4) + binary2.charAt(4) + binary3.charAt(4) + binary4.charAt(4)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(5) + binary2.charAt(5) + binary3.charAt(5) + binary4.charAt(5)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(6) + binary2.charAt(6) + binary3.charAt(6) + binary4.charAt(6)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        if ((binary1.charAt(7) + binary2.charAt(7) + binary3.charAt(7) + binary4.charAt(7)) % 2 == 0) {
-            binaryResult.append('0');
-        } else {
-            binaryResult.append('1');
-        }
-        String finalBinaryResult = binaryResult.toString();
-        int decimal = Integer.parseInt(finalBinaryResult,2);
-        String hexString = Integer.toString(decimal,16);
-        currentText[0] = hexString;
 
         return currentText;
     }
-    
+
+    public static String shiftLeft(String binary) {
+        StringBuilder binaryResult = new StringBuilder();
+        binaryResult.append(binary.charAt(1));
+        binaryResult.append(binary.charAt(2));
+        binaryResult.append(binary.charAt(3));
+        binaryResult.append(binary.charAt(4));
+        binaryResult.append(binary.charAt(5));
+        binaryResult.append(binary.charAt(6));
+        binaryResult.append(binary.charAt(7));
+        binaryResult.append('0');
+        return binaryResult.toString();
+    }
+
+    public static String computeBinary(int multiplier, String matrixHex) {
+        // Converts String hex to and Int hex
+        int hex = Integer.decode(String.format("0x%s", matrixHex));
+        // Converts Int hex to binary String.
+        String binary = Integer.toBinaryString(hex);
+        StringBuilder sb = new StringBuilder(binary);
+        // Adds zeros to the front of the string if it is less than 8 digits.
+        while (sb.length() < 8) {
+            sb.insert(0, "0");
+        }
+        binary = sb.toString();
+        String originalBinary = binary;
+        //Case 2: Not Leading 1, for 0x02
+        if (binary.charAt(0) == '0' && multiplier == 0x02) {
+            hex = multiplier * Integer.decode(String.format("0x%s", matrixHex));
+            binary = Integer.toBinaryString(hex);
+
+        }
+        // Case 3 Leading 1, for 0x02
+        else if (binary.charAt(0) == '1' && multiplier == 0x02){
+            binary = shiftLeft(binary);
+            BigInteger shiftedValue = new BigInteger(binary, 2);
+            BigInteger pValue = new BigInteger("11011", 2);
+            BigInteger xorResult = shiftedValue.xor(pValue);
+            binary = xorResult.toString(2);
+
+        }
+        // Case 4 No Leading 1, for 0x03
+        else if (binary.charAt(0) == '0' && multiplier == 0x03){
+            hex = (0x02 * Integer.decode(String.format("0x%s", matrixHex))) ^ Integer.decode(String.format("0x%s", matrixHex));
+            binary = Integer.toBinaryString(hex);
+        }
+        // Case 5 Leading 1, for 0x03
+        else if (binary.charAt(0) == '1' && multiplier == 0x03){
+            binary = shiftLeft(binary);
+            BigInteger shiftedValue = new BigInteger(binary, 2);
+            BigInteger pValue = new BigInteger("11011", 2);
+            BigInteger xorResult = shiftedValue.xor(pValue);
+            BigInteger originalValue = new BigInteger(originalBinary, 2);
+            BigInteger finalResult = xorResult.xor(originalValue);
+            binary = finalResult.toString(2);
+        }
+        return binary;
+    }
 }
