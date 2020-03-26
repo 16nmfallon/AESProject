@@ -61,9 +61,11 @@ public class AES {
         BigInteger keyInt = new BigInteger(key, 16);
         BigInteger xorResult = plaintextInt.xor(keyInt);
         String s3 = xorResult.toString(16);
-        if (plaintext.substring(0,2).equals("00") && key.substring(0,2).equals("00")) {
-            s3 = "00" + s3;
+        StringBuilder sb = new StringBuilder(s3);
+        while (sb.length() < 32) {
+            sb.insert(0, "0");
         }
+        s3 = sb.toString();
         String[] currentText = new String[16];
         int k = 0;
         for (int i = 0; i < 16; i++) {
@@ -152,6 +154,8 @@ public class AES {
         int decimal = Integer.parseInt(finalBinaryResult,2);
         String hexString = Integer.toString(decimal,16);
         currentText[0] = hexString;
-        return temp;
+
+        return currentText;
     }
+    
 }
