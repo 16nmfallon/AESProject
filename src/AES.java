@@ -1,5 +1,6 @@
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -37,6 +38,7 @@ public class AES {
         System.out.println("round[0].input: " + plaintextString);
         System.out.println("round[0].k_sch: " + keyString);
         String[] currentText = xorString(plaintextString, keyString);
+        String[] currentkey = new String[16];
         for (int i = 1; i <= 10; i++) {
             System.out.println("round[" + i + "].start: " + arrayToString(currentText));
             currentText = sBoxSubstitution(currentText);
@@ -45,6 +47,8 @@ public class AES {
             System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
             currentText = columnMultiplication(currentText);
             System.out.println("round][" + i + "].m_col: " + arrayToString(currentText));
+            currentkey = keySchedule(key);
+            System.out.println("round][" + i + "].k_sch: " + arrayToString(currentkey));
 
         }
 
@@ -80,7 +84,7 @@ public class AES {
     }
 
     private static String[] sBoxSubstitution(String[] currentText) {
-        for(int i = 0; i < 16; i++) {
+        for(int i = 0; i < currentText.length; i++) {
             currentText[i] = sbox.get(currentText[i]);
         }
         return currentText;
@@ -309,5 +313,54 @@ public class AES {
             binary = finalResult.toString(2);
         }
         return binary;
+    }
+
+    public static String[] keySchedule (String[] key) {
+        //String[] temp = Arrays.copyOf(currentText, 16);
+        String[] finalKey = new String[16];
+        int count = 0;
+        String[] finalResult = new String[4];
+        for(int j = 0; j < 4; j++) {
+            if (j == 0) {
+                String[] shiftedColumn = new String[]{key[13], key[14], key[15], key[12]};
+                String[] afterSubstitution = sBoxSubstitution(shiftedColumn);
+                String column1 = arrayToString(afterSubstitution);
+                String[] column2 = new String[4];
+                for (int i = 0; i < 4; i++) {
+                    column2[i] = key[i];
+                }
+                String[] result = xorStringLength4hex(column1, arrayToString(column2));
+                finalResult = xorStringLength4hex(arrayToString(result), "01000000");
+            } else {
+                String[] columnOne = finalResult;
+                String[] columnTwo = new String[]{key[(4*j)], key[1+(4*j)], key[2+(4*j)], key[3+(4*j)]};
+                finalResult = xorStringLength4hex(arrayToString(columnOne), arrayToString(columnTwo));
+            }
+            for (int k = 0; k < 4; k++) {
+                finalKey[count] = finalResult[k];
+                count++;
+            }
+        }
+
+        return finalKey;
+    }
+
+    private static String[] xorStringLength4hex(String plaintext, String key) {
+        BigInteger plaintextInt = new BigInteger(plaintext, 16);
+        BigInteger keyInt = new BigInteger(key, 16);
+        BigInteger xorResult = plaintextInt.xor(keyInt);
+        String s3 = xorResult.toString(16);
+        StringBuilder sb = new StringBuilder(s3);
+        while (sb.length() < 8) {
+            sb.insert(0, "0");
+        }
+        s3 = sb.toString();
+        String[] currentText = new String[4];
+        int k = 0;
+        for (int i = 0; i < 4; i++) {
+            currentText[i] = s3.substring(k, k+2);
+            k = k + 2;
+        }
+        return currentText;
     }
 }
