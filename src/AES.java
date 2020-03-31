@@ -37,9 +37,10 @@ public class AES {
         String keyString = arrayToString(key);
         System.out.println("round[0].input: " + plaintextString);
         System.out.println("round[0].k_sch: " + keyString);
-        String[] currentText = xorString(plaintextString, keyString);
-        String[] currentkey = new String[16];
+        String[] currentText = plaintext;
+        String[] currentkey = key;
         for (int i = 1; i <= 10; i++) {
+            currentText = xorString(arrayToString(currentText),arrayToString(currentkey));
             System.out.println("round[" + i + "].start: " + arrayToString(currentText));
             currentText = sBoxSubstitution(currentText);
             System.out.println("round[" + i + "].s_box: " + arrayToString(currentText));
@@ -47,9 +48,8 @@ public class AES {
             System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
             currentText = columnMultiplication(currentText);
             System.out.println("round][" + i + "].m_col: " + arrayToString(currentText));
-            currentkey = keySchedule(key);
+            currentkey = keySchedule(currentkey);
             System.out.println("round][" + i + "].k_sch: " + arrayToString(currentkey));
-
         }
 
 
@@ -251,6 +251,11 @@ public class AES {
             String finalBinaryResult = binaryResult.toString();
             int decimal = Integer.parseInt(finalBinaryResult,2);
             String hexString = Integer.toString(decimal,16);
+            if (hexString.length() == 1) {
+                StringBuilder sb = new StringBuilder(hexString);
+                sb.insert(0, "0");
+                hexString = sb.toString();
+            }
             currentText[i] = hexString;
         }
 
