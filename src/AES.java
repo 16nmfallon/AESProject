@@ -30,8 +30,10 @@ public class AES {
     public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
 
     public static void main(String[] args) {
-        String[] plaintext = {"00", "11", "22", "33", "44", "55", "66", "77", "88", "99", "aa", "bb", "cc", "dd", "ee", "ff"};
-        String[] key = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f"};
+        
+        String[] plaintext = {"54", "77", "6f", "20", "4f", "6e", "65", "20", "4e", "69", "6e", "65", "20", "54", "77", "6f"};
+        String[] key = {"54", "68", "61", "74", "73", "20", "6d", "79", "20", "4b", "75", "6e", "67", "20", "46", "75"};
+
 
         String plaintextString = arrayToString(plaintext);
         String keyString = arrayToString(key);
@@ -46,11 +48,16 @@ public class AES {
             System.out.println("round[" + i + "].s_box: " + arrayToString(currentText));
             currentText = rowSubstitution(currentText);
             System.out.println("round[" + i + "].s_row: " + arrayToString(currentText));
-            currentText = columnMultiplication(currentText);
-            System.out.println("round][" + i + "].m_col: " + arrayToString(currentText));
-            currentkey = keySchedule(currentkey);
-            System.out.println("round][" + i + "].k_sch: " + arrayToString(currentkey));
+            if (i < 10) {
+                currentText = columnMultiplication(currentText);
+                System.out.println("round[" + i + "].m_col: " + arrayToString(currentText));
+            }
+            currentkey = keySchedule(currentkey, i);
+            System.out.println("round[" + i + "].k_sch: " + arrayToString(currentkey));
         }
+
+        System.out.println("round[10].output: " + arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey))));
+
 
 
 
@@ -320,7 +327,7 @@ public class AES {
         return binary;
     }
 
-    public static String[] keySchedule (String[] key) {
+    public static String[] keySchedule (String[] key, int round) {
         //String[] temp = Arrays.copyOf(currentText, 16);
         String[] finalKey = new String[16];
         int count = 0;
@@ -335,7 +342,21 @@ public class AES {
                     column2[i] = key[i];
                 }
                 String[] result = xorStringLength4hex(column1, arrayToString(column2));
-                finalResult = xorStringLength4hex(arrayToString(result), "01000000");
+                String keyXor = new String();
+                if (round == 9) {
+                    keyXor = "1b000000";
+                } else if (round == 10) {
+                    keyXor = "36000000";
+                }
+                else {
+                    keyXor = Integer.toHexString((int) Math.pow(2, round - 1)) + "000000";
+                }
+                StringBuilder sb = new StringBuilder(keyXor);
+                while (sb.length() < 8) {
+                    sb.insert(0, "0");
+                }
+                keyXor = sb.toString();
+                finalResult = xorStringLength4hex(arrayToString(result), keyXor);
             } else {
                 String[] columnOne = finalResult;
                 String[] columnTwo = new String[]{key[(4*j)], key[1+(4*j)], key[2+(4*j)], key[3+(4*j)]};
