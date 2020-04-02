@@ -47,7 +47,49 @@ public class AESDecryption {
         }
     };
 
-    public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
+    public static final HashMap<String, String> ETable = new HashMap<String, String>() {
+        {
+            put("00", "01"); put("01", "03"); put("02", "05"); put("03", "0f"); put("04", "11"); put("05", "33"); put("06", "55"); put("07", "ff"); put("08", "1a"); put("09", "2e"); put("0a", "72"); put("0b", "96"); put("0c", "a1"); put("0d", "f8"); put("0e", "13"); put("0f", "35");
+            put("10", "5f"); put("11", "e1"); put("12", "38"); put("13", "48"); put("14", "d8"); put("15", "73"); put("16", "95"); put("17", "a4"); put("18", "f7"); put("19", "02"); put("1a", "06"); put("1b", "0a"); put("1c", "1e"); put("1d", "22"); put("1e", "66"); put("1f", "aa");
+            put("20", "e5"); put("21", "34"); put("22", "5c"); put("23", "e4"); put("24", "37"); put("25", "59"); put("26", "eb"); put("27", "26"); put("28", "6a"); put("29", "be"); put("2a", "d9"); put("2b", "70"); put("2c", "90"); put("2d", "ab"); put("2e", "e6"); put("2f", "31");
+            put("30", "53"); put("31", "f5"); put("32", "04"); put("33", "0c"); put("34", "14"); put("35", "3c"); put("36", "44"); put("37", "cc"); put("38", "4f"); put("39", "d1"); put("3a", "68"); put("3b", "b8"); put("3c", "d3"); put("3d", "6e"); put("3e", "b2"); put("3f", "cd");
+            put("40", "4c"); put("41", "d4"); put("42", "67"); put("43", "a9"); put("44", "e0"); put("45", "3b"); put("46", "4d"); put("47", "d7"); put("48", "62"); put("49", "a6"); put("4a", "f1"); put("4b", "08"); put("4c", "18"); put("4d", "28"); put("4e", "78"); put("4f", "88");
+            put("50", "83"); put("51", "9e"); put("52", "b9"); put("53", "d0"); put("54", "6b"); put("55", "bd"); put("56", "dc"); put("57", "7f"); put("58", "81"); put("59", "98"); put("5a", "b3"); put("5b", "c3"); put("5c", "49"); put("5d", "db"); put("5e", "76"); put("5f", "9a");
+            put("60", "b5"); put("61", "c4"); put("62", "57"); put("63", "f9"); put("64", "10"); put("65", "30"); put("66", "50"); put("67", "f0"); put("68", "0b"); put("69", "1d"); put("6a", "27"); put("6b", "69"); put("6c", "bb"); put("6d", "d6"); put("6e", "61"); put("6f", "a3");
+            put("70", "fe"); put("71", "19"); put("72", "2b"); put("73", "7d"); put("74", "87"); put("75", "92"); put("76", "ad"); put("77", "ec"); put("78", "2f"); put("79", "71"); put("7a", "93"); put("7b", "ae"); put("7c", "e9"); put("7d", "20"); put("7e", "60"); put("7f", "a0");
+            put("80", "fb"); put("81", "16"); put("82", "3a"); put("83", "4e"); put("84", "d2"); put("85", "6d"); put("86", "b7"); put("87", "c2"); put("88", "5d"); put("89", "e7"); put("8a", "32"); put("8b", "56"); put("8c", "fa"); put("8d", "15"); put("8e", "3f"); put("8f", "41");
+            put("90", "c3"); put("91", "5e"); put("92", "e2"); put("93", "3d"); put("94", "47"); put("95", "c9"); put("96", "40"); put("97", "c0"); put("98", "5b"); put("99", "ed"); put("9a", "2c"); put("9b", "74"); put("9c", "9c"); put("9d", "bf"); put("9e", "da"); put("9f", "75");
+            put("a0", "9f"); put("a1", "ba"); put("a2", "d5"); put("a3", "64"); put("a4", "ac"); put("a5", "ef"); put("a6", "2a"); put("a7", "7e"); put("a8", "82"); put("a9", "9d"); put("aa", "bc"); put("ab", "df"); put("ac", "7a"); put("ad", "8e"); put("ae", "89"); put("af", "80");
+            put("b0", "9b"); put("b1", "b6"); put("b2", "c1"); put("b3", "58"); put("b4", "e8"); put("b5", "23"); put("b6", "65"); put("b7", "af"); put("b8", "ea"); put("b9", "25"); put("ba", "6f"); put("bb", "b1"); put("bc", "c8"); put("bd", "43"); put("be", "c5"); put("bf", "54");
+            put("c0", "fc"); put("c1", "1f"); put("c2", "21"); put("c3", "63"); put("c4", "a5"); put("c5", "f4"); put("c6", "07"); put("c7", "09"); put("c8", "1b"); put("c9", "2d"); put("ca", "77"); put("cb", "99"); put("cc", "b0"); put("cd", "cb"); put("ce", "46"); put("cf", "ca");
+            put("d0", "45"); put("d1", "cf"); put("d2", "4a"); put("d3", "de"); put("d4", "79"); put("d5", "8b"); put("d6", "86"); put("d7", "91"); put("d8", "a8"); put("d9", "e3"); put("da", "3e"); put("db", "42"); put("dc", "c6"); put("dd", "51"); put("de", "f3"); put("df", "0e");
+            put("e0", "12"); put("e1", "36"); put("e2", "5a"); put("e3", "ee"); put("e4", "29"); put("e5", "7b"); put("e6", "8d"); put("e7", "8c"); put("e8", "8f"); put("e9", "8a"); put("ea", "85"); put("eb", "94"); put("ec", "a7"); put("ed", "f2"); put("ee", "0d"); put("ef", "17");
+            put("f0", "39"); put("f1", "4b"); put("f2", "dd"); put("f3", "7c"); put("f4", "84"); put("f5", "97"); put("f6", "a2"); put("f7", "fd"); put("f8", "1c"); put("f9", "24"); put("fa", "6c"); put("fb", "b4"); put("fc", "c7"); put("fd", "52"); put("fe", "f6"); put("ff", "01");
+        }
+    };
+
+    public static final HashMap<String, String> LTable = new HashMap<String, String>() {
+        {
+            put("00", "00"); put("01", "00"); put("02", "19"); put("03", "01"); put("04", "32"); put("05", "02"); put("06", "1a"); put("07", "c6"); put("08", "4b"); put("09", "c7"); put("0a", "1b"); put("0b", "68"); put("0c", "33"); put("0d", "ee"); put("0e", "df"); put("0f", "03");
+            put("10", "64"); put("11", "04"); put("12", "e0"); put("13", "0e"); put("14", "34"); put("15", "8d"); put("16", "81"); put("17", "ef"); put("18", "4c"); put("19", "71"); put("1a", "08"); put("1b", "c8"); put("1c", "f8"); put("1d", "69"); put("1e", "1c"); put("1f", "c1");
+            put("20", "7d"); put("21", "c2"); put("22", "1d"); put("23", "b5"); put("24", "f9"); put("25", "b9"); put("26", "27"); put("27", "6a"); put("28", "4d"); put("29", "e4"); put("2a", "a6"); put("2b", "72"); put("2c", "9a"); put("2d", "c9"); put("2e", "09"); put("2f", "78");
+            put("30", "65"); put("31", "2f"); put("32", "8a"); put("33", "05"); put("34", "21"); put("35", "0f"); put("36", "e1"); put("37", "24"); put("38", "12"); put("39", "f0"); put("3a", "82"); put("3b", "45"); put("3c", "35"); put("3d", "93"); put("3e", "da"); put("3f", "8e");
+            put("40", "96"); put("41", "8f"); put("42", "db"); put("43", "bd"); put("44", "36"); put("45", "d0"); put("46", "ce"); put("47", "94"); put("48", "13"); put("49", "5c"); put("4a", "d2"); put("4b", "f1"); put("4c", "40"); put("4d", "46"); put("4e", "83"); put("4f", "38");
+            put("50", "66"); put("51", "dd"); put("52", "fd"); put("53", "30"); put("54", "bf"); put("55", "06"); put("56", "8b"); put("57", "62"); put("58", "b3"); put("59", "25"); put("5a", "e2"); put("5b", "98"); put("5c", "22"); put("5d", "88"); put("5e", "91"); put("5f", "10");
+            put("60", "7e"); put("61", "6e"); put("62", "48"); put("63", "c3"); put("64", "a3"); put("65", "b6"); put("66", "1e"); put("67", "42"); put("68", "3a"); put("69", "6b"); put("6a", "28"); put("6b", "54"); put("6c", "fa"); put("6d", "85"); put("6e", "3d"); put("6f", "ba");
+            put("70", "2b"); put("71", "79"); put("72", "0a"); put("73", "15"); put("74", "9b"); put("75", "9f"); put("76", "5e"); put("77", "ca"); put("78", "4e"); put("79", "d4"); put("7a", "ac"); put("7b", "e5"); put("7c", "f3"); put("7d", "73"); put("7e", "a7"); put("7f", "57");
+            put("80", "af"); put("81", "58"); put("82", "a8"); put("83", "50"); put("84", "f4"); put("85", "ea"); put("86", "d6"); put("87", "74"); put("88", "4f"); put("89", "ae"); put("8a", "e9"); put("8b", "d5"); put("8c", "e7"); put("8d", "e6"); put("8e", "ad"); put("8f", "e8");
+            put("90", "2c"); put("91", "d7"); put("92", "75"); put("93", "7a"); put("94", "eb"); put("95", "16"); put("96", "0b"); put("97", "f5"); put("98", "59"); put("99", "cb"); put("9a", "5f"); put("9b", "b0"); put("9c", "9c"); put("9d", "a9"); put("9e", "51"); put("9f", "a0");
+            put("a0", "7f"); put("a1", "0c"); put("a2", "f6"); put("a3", "6f"); put("a4", "17"); put("a5", "c4"); put("a6", "49"); put("a7", "ec"); put("a8", "d8"); put("a9", "43"); put("aa", "1f"); put("ab", "2d"); put("ac", "a4"); put("ad", "76"); put("ae", "7b"); put("af", "b7");
+            put("b0", "cc"); put("b1", "bb"); put("b2", "3e"); put("b3", "5a"); put("b4", "fb"); put("b5", "60"); put("b6", "b1"); put("b7", "86"); put("b8", "3b"); put("b9", "52"); put("ba", "a1"); put("bb", "6c"); put("bc", "aa"); put("bd", "55"); put("be", "29"); put("bf", "9d");
+            put("c0", "97"); put("c1", "b2"); put("c2", "87"); put("c3", "90"); put("c4", "61"); put("c5", "be"); put("c6", "dc"); put("c7", "fc"); put("c8", "bc"); put("c9", "95"); put("ca", "cf"); put("cb", "cd"); put("cc", "37"); put("cd", "3f"); put("ce", "5b"); put("cf", "d1");
+            put("d0", "53"); put("d1", "39"); put("d2", "84"); put("d3", "3c"); put("d4", "41"); put("d5", "a2"); put("d6", "6d"); put("d7", "47"); put("d8", "14"); put("d9", "2a"); put("da", "9e"); put("db", "5d"); put("dc", "56"); put("dd", "f2"); put("de", "d3"); put("df", "ab");
+            put("e0", "44"); put("e1", "11"); put("e2", "92"); put("e3", "d9"); put("e4", "23"); put("e5", "20"); put("e6", "2e"); put("e7", "89"); put("e8", "b4"); put("e9", "7c"); put("ea", "b8"); put("eb", "26"); put("ec", "77"); put("ed", "99"); put("ee", "e3"); put("ef", "a5");
+            put("f0", "67"); put("f1", "4a"); put("f2", "ed"); put("f3", "de"); put("f4", "c5"); put("f5", "31"); put("f6", "fe"); put("f7", "18"); put("f8", "0d"); put("f9", "63"); put("fa", "8c"); put("fb", "80"); put("fc", "c0"); put("fd", "f7"); put("fe", "70"); put("ff", "07");
+        }
+    };
+
+    public static final int[][] multiplicationMatrix = {{0x0e, 0x0b, 0x0d, 0x09}, {0x09, 0x0e, 0x0b, 0x0d}, {0x0d, 0x09, 0x0e, 0x0b}, {0x0b, 0x0d, 0x09, 0x0e}};
 
     public static void main(String[] args) {
 
@@ -70,12 +112,13 @@ public class AESDecryption {
             System.out.println("round[" + i + "].is_box: " + arrayToString(currentText));
             currentkey = keySchedule(currentkey, i);
             System.out.println("round[" + i + "].ik_sch: " + arrayToString(currentkey));
-            /*
-            if (i < 10) {
-                currentText = columnMultiplication(currentText);
-                System.out.println("round[" + i + "].m_col: " + arrayToString(currentText));
-            }
-             */
+            currentText = xorString(arrayToString(currentText),arrayToString(currentkey));
+            System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
+
+//            if (i < 10) {
+//                currentText = columnMultiplication(currentText);
+//                System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
+//            }
         }
 
         System.out.println("round[10].output: " + arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey))));
@@ -144,217 +187,12 @@ public class AESDecryption {
     }
 
     private static String[] columnMultiplication(String[] currentText) {
-        String[] temp = Arrays.copyOf(currentText, 16);
 
-        for (int i = 0; i < 16; i++) {
-            String binary1 = "";
-            String binary2 = "";
-            String binary3 = "";
-            String binary4 = "";
-            int multiplier1 = 0;
-            int multiplier2 = 0;
-            int multiplier3 = 0;
-            int multiplier4 = 0;
-            // Setting the right multiplier for the multiplication matrix.
-            if (i % 4 == 0) {
-                multiplier1 = multiplicationMatrix[0][0];
-                multiplier2 = multiplicationMatrix[0][1];
-                multiplier3 = multiplicationMatrix[0][2];
-                multiplier4 = multiplicationMatrix[0][3];
-            }
-            else if (i % 4 == 1) {
-                multiplier1 = multiplicationMatrix[1][0];
-                multiplier2 = multiplicationMatrix[1][1];
-                multiplier3 = multiplicationMatrix[1][2];
-                multiplier4 = multiplicationMatrix[1][3];
-            }
-            else if (i % 4 == 2) {
-                multiplier1 = multiplicationMatrix[2][0];
-                multiplier2 = multiplicationMatrix[2][1];
-                multiplier3 = multiplicationMatrix[2][2];
-                multiplier4 = multiplicationMatrix[2][3];
-            }
-            else {
-                multiplier1 = multiplicationMatrix[3][0];
-                multiplier2 = multiplicationMatrix[3][1];
-                multiplier3 = multiplicationMatrix[3][2];
-                multiplier4 = multiplicationMatrix[3][3];
-            }
-            String matrixHex1 = "";
-            String matrixHex2 = "";
-            String matrixHex3 = "";
-            String matrixHex4 = "";
-            // Setting the number in the matrix that needs to be multiplied
-            if (i < 4) {
-                matrixHex1 = temp[0];
-                matrixHex2 = temp[1];
-                matrixHex3 = temp[2];
-                matrixHex4 = temp[3];
-            }
-            else if (i < 8) {
-                matrixHex1 = temp[4];
-                matrixHex2 = temp[5];
-                matrixHex3 = temp[6];
-                matrixHex4 = temp[7];
-            }
-            else if (i < 12) {
-                matrixHex1 = temp[8];
-                matrixHex2 = temp[9];
-                matrixHex3 = temp[10];
-                matrixHex4 = temp[11];
-            }
-            else {
-                matrixHex1 = temp[12];
-                matrixHex2 = temp[13];
-                matrixHex3 = temp[14];
-                matrixHex4 = temp[15];
-            }
-
-            // computes the correct binary number based on the hex and the multiplier that were passed in.
-            binary1 = computeBinary(multiplier1, matrixHex1);
-            binary2 = computeBinary(multiplier2, matrixHex2);
-            binary3 = computeBinary(multiplier3, matrixHex3);
-            binary4 = computeBinary(multiplier4, matrixHex4);
-
-            // Adds on extra 0's in the front of the strings if it is less than 8 digits.
-            StringBuilder sb1 = new StringBuilder(binary1);
-            while (sb1.length() < 8) {
-                sb1.insert(0, "0");
-            }
-            binary1 = sb1.toString();
-
-            StringBuilder sb2 = new StringBuilder(binary2);
-            while (sb2.length() < 8) {
-                sb2.insert(0, "0");
-            }
-            binary2 = sb2.toString();
-
-            StringBuilder sb3 = new StringBuilder(binary3);
-            while (sb3.length() < 8) {
-                sb3.insert(0, "0");
-            }
-            binary3 = sb3.toString();
-
-            StringBuilder sb4 = new StringBuilder(binary4);
-            while (sb4.length() < 8) {
-                sb4.insert(0, "0");
-            }
-            binary4 = sb4.toString();
-
-            // Does the xor operation without the carry over bit.
-            StringBuilder binaryResult = new StringBuilder();
-            if ((binary1.charAt(0) + binary2.charAt(0) + binary3.charAt(0) + binary4.charAt(0)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(1) + binary2.charAt(1) + binary3.charAt(1) + binary4.charAt(1)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(2) + binary2.charAt(2) + binary3.charAt(2) + binary4.charAt(2)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(3) + binary2.charAt(3) + binary3.charAt(3) + binary4.charAt(3)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(4) + binary2.charAt(4) + binary3.charAt(4) + binary4.charAt(4)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(5) + binary2.charAt(5) + binary3.charAt(5) + binary4.charAt(5)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(6) + binary2.charAt(6) + binary3.charAt(6) + binary4.charAt(6)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            if ((binary1.charAt(7) + binary2.charAt(7) + binary3.charAt(7) + binary4.charAt(7)) % 2 == 0) {
-                binaryResult.append('0');
-            } else {
-                binaryResult.append('1');
-            }
-            // Converts the binary back to hex and stores it into the main array.
-            String finalBinaryResult = binaryResult.toString();
-            int decimal = Integer.parseInt(finalBinaryResult,2);
-            String hexString = Integer.toString(decimal,16);
-            if (hexString.length() == 1) {
-                StringBuilder sb = new StringBuilder(hexString);
-                sb.insert(0, "0");
-                hexString = sb.toString();
-            }
-            currentText[i] = hexString;
-        }
 
         return currentText;
     }
 
-    public static String shiftLeft(String binary) {
-        StringBuilder binaryResult = new StringBuilder();
-        binaryResult.append(binary.charAt(1));
-        binaryResult.append(binary.charAt(2));
-        binaryResult.append(binary.charAt(3));
-        binaryResult.append(binary.charAt(4));
-        binaryResult.append(binary.charAt(5));
-        binaryResult.append(binary.charAt(6));
-        binaryResult.append(binary.charAt(7));
-        binaryResult.append('0');
-        return binaryResult.toString();
-    }
 
-    public static String computeBinary(int multiplier, String matrixHex) {
-        // Converts String hex to and Int hex
-        int hex = Integer.decode(String.format("0x%s", matrixHex));
-        // Converts Int hex to binary String.
-        String binary = Integer.toBinaryString(hex);
-        StringBuilder sb = new StringBuilder(binary);
-        // Adds zeros to the front of the string if it is less than 8 digits.
-        while (sb.length() < 8) {
-            sb.insert(0, "0");
-        }
-        binary = sb.toString();
-        String originalBinary = binary;
-        //Case 2: Not Leading 1, for 0x02
-        if (binary.charAt(0) == '0' && multiplier == 0x02) {
-            hex = multiplier * Integer.decode(String.format("0x%s", matrixHex));
-            binary = Integer.toBinaryString(hex);
-
-        }
-        // Case 3 Leading 1, for 0x02
-        else if (binary.charAt(0) == '1' && multiplier == 0x02){
-            binary = shiftLeft(binary);
-            BigInteger shiftedValue = new BigInteger(binary, 2);
-            BigInteger pValue = new BigInteger("11011", 2);
-            BigInteger xorResult = shiftedValue.xor(pValue);
-            binary = xorResult.toString(2);
-
-        }
-        // Case 4 No Leading 1, for 0x03
-        else if (binary.charAt(0) == '0' && multiplier == 0x03){
-            hex = (0x02 * Integer.decode(String.format("0x%s", matrixHex))) ^ Integer.decode(String.format("0x%s", matrixHex));
-            binary = Integer.toBinaryString(hex);
-        }
-        // Case 5 Leading 1, for 0x03
-        else if (binary.charAt(0) == '1' && multiplier == 0x03){
-            binary = shiftLeft(binary);
-            BigInteger shiftedValue = new BigInteger(binary, 2);
-            BigInteger pValue = new BigInteger("11011", 2);
-            BigInteger xorResult = shiftedValue.xor(pValue);
-            BigInteger originalValue = new BigInteger(originalBinary, 2);
-            BigInteger finalResult = xorResult.xor(originalValue);
-            binary = finalResult.toString(2);
-        }
-        return binary;
-    }
 
     public static String[] keySchedule (String[] key, int round) {
         //String[] temp = Arrays.copyOf(currentText, 16);
