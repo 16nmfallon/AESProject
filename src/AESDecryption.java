@@ -25,6 +25,28 @@ public class AESDecryption {
         }
     };
 
+    // Needed in Key Scheduling
+    public static final HashMap<String, String> sboxForEncryption = new HashMap<String, String>() {
+        {
+            put("00", "63"); put("01", "7c"); put("02", "77"); put("03", "7b"); put("04", "f2"); put("05", "6b"); put("06", "6f"); put("07", "c5"); put("08", "30"); put("09", "01"); put("0a", "67"); put("0b", "2b"); put("0c", "fe"); put("0d", "d7"); put("0e", "ab"); put("0f", "76");
+            put("10", "ca"); put("11", "82"); put("12", "c9"); put("13", "7d"); put("14", "fa"); put("15", "59"); put("16", "47"); put("17", "f0"); put("18", "ad"); put("19", "d4"); put("1a", "a2"); put("1b", "af"); put("1c", "9c"); put("1d", "a4"); put("1e", "72"); put("1f", "c0");
+            put("20", "b7"); put("21", "fd"); put("22", "93"); put("23", "26"); put("24", "36"); put("25", "3f"); put("26", "f7"); put("27", "cc"); put("28", "34"); put("29", "a5"); put("2a", "e5"); put("2b", "f1"); put("2c", "71"); put("2d", "d8"); put("2e", "31"); put("2f", "15");
+            put("30", "04"); put("31", "c7"); put("32", "23"); put("33", "c3"); put("34", "18"); put("35", "96"); put("36", "05"); put("37", "9a"); put("38", "07"); put("39", "12"); put("3a", "80"); put("3b", "e2"); put("3c", "eb"); put("3d", "27"); put("3e", "b2"); put("3f", "75");
+            put("40", "09"); put("41", "83"); put("42", "2c"); put("43", "1a"); put("44", "1b"); put("45", "6e"); put("46", "5a"); put("47", "a0"); put("48", "52"); put("49", "3b"); put("4a", "d6"); put("4b", "b3"); put("4c", "29"); put("4d", "e3"); put("4e", "2f"); put("4f", "84");
+            put("50", "53"); put("51", "d1"); put("52", "00"); put("53", "ed"); put("54", "20"); put("55", "fc"); put("56", "b1"); put("57", "5b"); put("58", "6a"); put("59", "cb"); put("5a", "be"); put("5b", "39"); put("5c", "4a"); put("5d", "4c"); put("5e", "58"); put("5f", "cf");
+            put("60", "d0"); put("61", "ef"); put("62", "aa"); put("63", "fb"); put("64", "43"); put("65", "4d"); put("66", "33"); put("67", "85"); put("68", "45"); put("69", "f9"); put("6a", "02"); put("6b", "7f"); put("6c", "50"); put("6d", "3c"); put("6e", "9f"); put("6f", "a8");
+            put("70", "51"); put("71", "a3"); put("72", "40"); put("73", "8f"); put("74", "92"); put("75", "9d"); put("76", "38"); put("77", "f5"); put("78", "bc"); put("79", "b6"); put("7a", "da"); put("7b", "21"); put("7c", "10"); put("7d", "ff"); put("7e", "f3"); put("7f", "d2");
+            put("80", "cd"); put("81", "0c"); put("82", "13"); put("83", "ec"); put("84", "5f"); put("85", "97"); put("86", "44"); put("87", "17"); put("88", "c4"); put("89", "a7"); put("8a", "7e"); put("8b", "3d"); put("8c", "64"); put("8d", "5d"); put("8e", "19"); put("8f", "73");
+            put("90", "60"); put("91", "81"); put("92", "4f"); put("93", "dc"); put("94", "22"); put("95", "2a"); put("96", "90"); put("97", "88"); put("98", "46"); put("99", "ee"); put("9a", "b8"); put("9b", "14"); put("9c", "de"); put("9d", "5e"); put("9e", "0b"); put("9f", "db");
+            put("a0", "e0"); put("a1", "32"); put("a2", "3a"); put("a3", "0a"); put("a4", "49"); put("a5", "06"); put("a6", "24"); put("a7", "5c"); put("a8", "c2"); put("a9", "d3"); put("aa", "ac"); put("ab", "62"); put("ac", "91"); put("ad", "95"); put("ae", "e4"); put("af", "79");
+            put("b0", "e7"); put("b1", "c8"); put("b2", "37"); put("b3", "6d"); put("b4", "8d"); put("b5", "d5"); put("b6", "4e"); put("b7", "a9"); put("b8", "6c"); put("b9", "56"); put("ba", "f4"); put("bb", "ea"); put("bc", "65"); put("bd", "7a"); put("be", "ae"); put("bf", "08");
+            put("c0", "ba"); put("c1", "78"); put("c2", "25"); put("c3", "2e"); put("c4", "1c"); put("c5", "a6"); put("c6", "b4"); put("c7", "c6"); put("c8", "e8"); put("c9", "dd"); put("ca", "74"); put("cb", "1f"); put("cc", "4b"); put("cd", "bd"); put("ce", "8b"); put("cf", "8a");
+            put("d0", "70"); put("d1", "3e"); put("d2", "b5"); put("d3", "66"); put("d4", "48"); put("d5", "03"); put("d6", "f6"); put("d7", "0e"); put("d8", "61"); put("d9", "35"); put("da", "57"); put("db", "b9"); put("dc", "86"); put("dd", "c1"); put("de", "1d"); put("df", "9e");
+            put("e0", "e1"); put("e1", "f8"); put("e2", "98"); put("e3", "11"); put("e4", "69"); put("e5", "d9"); put("e6", "8e"); put("e7", "94"); put("e8", "9b"); put("e9", "1e"); put("ea", "87"); put("eb", "e9"); put("ec", "ce"); put("ed", "55"); put("ee", "28"); put("ef", "df");
+            put("f0", "8c"); put("f1", "a1"); put("f2", "89"); put("f3", "0d"); put("f4", "bf"); put("f5", "e6"); put("f6", "42"); put("f7", "68"); put("f8", "41"); put("f9", "99"); put("fa", "2d"); put("fb", "0f"); put("fc", "b0"); put("fd", "54"); put("fe", "bb"); put("ff", "16");
+        }
+    };
+
     public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
 
     public static void main(String[] args) {
@@ -46,13 +68,13 @@ public class AESDecryption {
             System.out.println("round[" + i + "].is_row: " + arrayToString(currentText));
             currentText = sBoxSubstitution(currentText);
             System.out.println("round[" + i + "].is_box: " + arrayToString(currentText));
+            currentkey = keySchedule(currentkey, i);
+            System.out.println("round[" + i + "].ik_sch: " + arrayToString(currentkey));
             /*
             if (i < 10) {
                 currentText = columnMultiplication(currentText);
                 System.out.println("round[" + i + "].m_col: " + arrayToString(currentText));
             }
-            currentkey = keySchedule(currentkey, i);
-            System.out.println("round[" + i + "].k_sch: " + arrayToString(currentkey));
              */
         }
 
@@ -93,6 +115,13 @@ public class AESDecryption {
     private static String[] sBoxSubstitution(String[] currentText) {
         for(int i = 0; i < currentText.length; i++) {
             currentText[i] = sbox.get(currentText[i]);
+        }
+        return currentText;
+    }
+
+    private static String[] sBoxSubstitutionForKeyScheduling(String[] currentText) {
+        for(int i = 0; i < currentText.length; i++) {
+            currentText[i] = sboxForEncryption.get(currentText[i]);
         }
         return currentText;
     }
@@ -330,12 +359,12 @@ public class AESDecryption {
     public static String[] keySchedule (String[] key, int round) {
         //String[] temp = Arrays.copyOf(currentText, 16);
         String[] finalKey = new String[16];
-        int count = 0;
+        int count = 15;
         String[] finalResult = new String[4];
-        for(int j = 0; j < 4; j++) {
+        for(int j = 3; j >= 0; j--) {
             if (j == 0) {
-                String[] shiftedColumn = new String[]{key[13], key[14], key[15], key[12]};
-                String[] afterSubstitution = sBoxSubstitution(shiftedColumn);
+                String[] shiftedColumn = new String[]{finalKey[13], finalKey[14], finalKey[15], finalKey[12]};
+                String[] afterSubstitution = sBoxSubstitutionForKeyScheduling(shiftedColumn);
                 String column1 = arrayToString(afterSubstitution);
                 String[] column2 = new String[4];
                 for (int i = 0; i < 4; i++) {
@@ -343,13 +372,13 @@ public class AESDecryption {
                 }
                 String[] result = xorStringLength4hex(column1, arrayToString(column2));
                 String keyXor = new String();
-                if (round == 9) {
+                if (round == 2) {
                     keyXor = "1b000000";
-                } else if (round == 10) {
+                } else if (round == 1) {
                     keyXor = "36000000";
                 }
                 else {
-                    keyXor = Integer.toHexString((int) Math.pow(2, round - 1)) + "000000";
+                    keyXor = Integer.toHexString((int) Math.pow(2, 10 - round)) + "000000";
                 }
                 StringBuilder sb = new StringBuilder(keyXor);
                 while (sb.length() < 8) {
@@ -358,13 +387,13 @@ public class AESDecryption {
                 keyXor = sb.toString();
                 finalResult = xorStringLength4hex(arrayToString(result), keyXor);
             } else {
-                String[] columnOne = finalResult;
+                String[] columnOne = new String[]{key[(4*(j-1))], key[1+(4*(j-1))], key[2+(4*(j-1))], key[3+(4*(j-1))]};;
                 String[] columnTwo = new String[]{key[(4*j)], key[1+(4*j)], key[2+(4*j)], key[3+(4*j)]};
                 finalResult = xorStringLength4hex(arrayToString(columnOne), arrayToString(columnTwo));
             }
-            for (int k = 0; k < 4; k++) {
+            for (int k = 3; k >= 0; k--) {
                 finalKey[count] = finalResult[k];
-                count++;
+                count--;
             }
         }
 
