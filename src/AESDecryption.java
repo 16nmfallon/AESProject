@@ -54,7 +54,7 @@ public class AESDecryption {
             put("20", "e5"); put("21", "34"); put("22", "5c"); put("23", "e4"); put("24", "37"); put("25", "59"); put("26", "eb"); put("27", "26"); put("28", "6a"); put("29", "be"); put("2a", "d9"); put("2b", "70"); put("2c", "90"); put("2d", "ab"); put("2e", "e6"); put("2f", "31");
             put("30", "53"); put("31", "f5"); put("32", "04"); put("33", "0c"); put("34", "14"); put("35", "3c"); put("36", "44"); put("37", "cc"); put("38", "4f"); put("39", "d1"); put("3a", "68"); put("3b", "b8"); put("3c", "d3"); put("3d", "6e"); put("3e", "b2"); put("3f", "cd");
             put("40", "4c"); put("41", "d4"); put("42", "67"); put("43", "a9"); put("44", "e0"); put("45", "3b"); put("46", "4d"); put("47", "d7"); put("48", "62"); put("49", "a6"); put("4a", "f1"); put("4b", "08"); put("4c", "18"); put("4d", "28"); put("4e", "78"); put("4f", "88");
-            put("50", "83"); put("51", "9e"); put("52", "b9"); put("53", "d0"); put("54", "6b"); put("55", "bd"); put("56", "dc"); put("57", "7f"); put("58", "81"); put("59", "98"); put("5a", "b3"); put("5b", "c3"); put("5c", "49"); put("5d", "db"); put("5e", "76"); put("5f", "9a");
+            put("50", "83"); put("51", "9e"); put("52", "b9"); put("53", "d0"); put("54", "6b"); put("55", "bd"); put("56", "dc"); put("57", "7f"); put("58", "81"); put("59", "98"); put("5a", "b3"); put("5b", "ce"); put("5c", "49"); put("5d", "db"); put("5e", "76"); put("5f", "9a");
             put("60", "b5"); put("61", "c4"); put("62", "57"); put("63", "f9"); put("64", "10"); put("65", "30"); put("66", "50"); put("67", "f0"); put("68", "0b"); put("69", "1d"); put("6a", "27"); put("6b", "69"); put("6c", "bb"); put("6d", "d6"); put("6e", "61"); put("6f", "a3");
             put("70", "fe"); put("71", "19"); put("72", "2b"); put("73", "7d"); put("74", "87"); put("75", "92"); put("76", "ad"); put("77", "ec"); put("78", "2f"); put("79", "71"); put("7a", "93"); put("7b", "ae"); put("7c", "e9"); put("7d", "20"); put("7e", "60"); put("7f", "a0");
             put("80", "fb"); put("81", "16"); put("82", "3a"); put("83", "4e"); put("84", "d2"); put("85", "6d"); put("86", "b7"); put("87", "c2"); put("88", "5d"); put("89", "e7"); put("8a", "32"); put("8b", "56"); put("8c", "fa"); put("8d", "15"); put("8e", "3f"); put("8f", "41");
@@ -115,12 +115,13 @@ public class AESDecryption {
             currentkey = keySchedule(currentkey, i);
             System.out.println("round[" + i + "].ik_sch: " + arrayToString(currentkey));
             currentText = xorString(arrayToString(currentText),arrayToString(currentkey));
-            System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
-            currentText = columnMultiplication(currentText);
-//            if (i < 10) {
-//                currentText = columnMultiplication(currentText);
-//                System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
-//            }
+            if (i < 10) {
+                System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
+                currentText = columnMultiplication(currentText);
+            }
+            if (i == 10) {
+                currentText = xorString(arrayToString(currentText), arrayToString(currentkey));
+            }
         }
 
         System.out.println("round[10].output: " + arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey))));
@@ -254,55 +255,131 @@ public class AESDecryption {
                 matrixHex4 = temp[15];
             }
 
-            int LTableResult1 = Integer.decode(String.format("0x%s", LTable.get(multiplier1))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex1)));
-            if (LTableResult1 > 0xff) {
-                LTableResult1 = LTableResult1 - 0xff;
+            int LTableResult1;
+            if (Integer.decode(String.format("0x%s", matrixHex1)) == 0) {
+                LTableResult1 = 0;
+            } else if (Integer.decode(String.format("0x%s", matrixHex1)) == 1) {
+                LTableResult1 = Integer.decode(multiplier1);
+            } else {
+                LTableResult1 = Integer.decode(String.format("0x%s", LTable.get(multiplier1))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex1)));
+                if (LTableResult1 > 0xff) {
+                    LTableResult1 = LTableResult1 - 0xff;
+                }
             }
-            int LTableResult2 = Integer.decode(String.format("0x%s", LTable.get(multiplier2))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex2)));
-            if (LTableResult2 > 0xff) {
-                LTableResult2 = LTableResult2 - 0xff;
+
+            int LTableResult2;
+            if (Integer.decode(String.format("0x%s", matrixHex2)) == 0) {
+                LTableResult2 = 0;
+            } else if (Integer.decode(String.format("0x%s", matrixHex2)) == 1) {
+                LTableResult2 = Integer.decode(multiplier2);
+            } else {
+                LTableResult2 = Integer.decode(String.format("0x%s", LTable.get(multiplier2))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex2)));
+                if (LTableResult2 > 0xff) {
+                    LTableResult2 = LTableResult2 - 0xff;
+                }
             }
-            int LTableResult3 = Integer.decode(String.format("0x%s", LTable.get(multiplier3))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex3)));
-            if (LTableResult3 > 0xff) {
-                LTableResult3 = LTableResult3 - 0xff;
+
+            int LTableResult3;
+            if (Integer.decode(String.format("0x%s", matrixHex3)) == 0) {
+                LTableResult3 = 0;
+            } else if (Integer.decode(String.format("0x%s", matrixHex3)) == 1) {
+                LTableResult3 = Integer.decode(multiplier3);
+            } else {
+                LTableResult3 = Integer.decode(String.format("0x%s", LTable.get(multiplier3))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex3)));
+                if (LTableResult3 > 0xff) {
+                    LTableResult3 = LTableResult3 - 0xff;
+                }
             }
-            int LTableResult4 = Integer.decode(String.format("0x%s", LTable.get(multiplier4))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex4)));
-            if (LTableResult4 > 0xff) {
-                LTableResult4 = LTableResult4 - 0xff;
+
+            int LTableResult4;
+            if (Integer.decode(String.format("0x%s", matrixHex4)) == 0) {
+                LTableResult4 = 0;
+            } else if (Integer.decode(String.format("0x%s", matrixHex4)) == 1) {
+                LTableResult4 = Integer.decode(multiplier4);
+            } else {
+                LTableResult4 = Integer.decode(String.format("0x%s", LTable.get(multiplier4))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex4)));
+                if (LTableResult4 > 0xff) {
+                    LTableResult4 = LTableResult4 - 0xff;
+                }
             }
+
 
             String LTableResultString1 = "";
-            String ETableSub1 = "";
+            String ETableSub1 = "00";
             String LTableResultString2 = "";
-            String ETableSub2 = "";
+            String ETableSub2 = "00";
             String LTableResultString3 = "";
-            String ETableSub3 = "";
+            String ETableSub3 = "00";
             String LTableResultString4 = "";
-            String ETableSub4 = "";
+            String ETableSub4 = "00";
 
-            if (LTableResult1 <= 0x0f) {
+
+            if (LTableResult1 == 0) {
+                ETableSub1 = "00";
+            }
+            else if (matrixHex1 == "01") {
+                ETableSub1 = multiplier1;
+            }
+            else if (LTableResult1 <= 0x09) {
                 LTableResultString1 = String.format("%02d", LTableResult1);
+                ETableSub1 = ETable.get(LTableResultString1);
+            }
+            else if (LTableResult1 >= 0x0a && LTableResult1 <= 0x0f) {
+                LTableResultString1 = sideCase(LTableResult1);
                 ETableSub1 = ETable.get(LTableResultString1);
             }
             else {
                 ETableSub1 = ETable.get(Integer.toHexString(LTableResult1));
             }
-            if (LTableResult2 <= 0x0f) {
+
+            if (LTableResult2 == 0) {
+                ETableSub2 = "00";
+            }
+            else if (matrixHex2 == "01") {
+                ETableSub2 = multiplier2;
+            }
+            else if (LTableResult2 <= 0x09) {
                 LTableResultString2 = String.format("%02d", LTableResult2);
+                ETableSub2 = ETable.get(LTableResultString2);
+            }
+            else if (LTableResult2 >= 0x0a && LTableResult2 <= 0x0f) {
+                LTableResultString2 = sideCase(LTableResult2);
                 ETableSub2 = ETable.get(LTableResultString2);
             }
             else {
                 ETableSub2 = ETable.get(Integer.toHexString(LTableResult2));
             }
-            if (LTableResult3 <= 0x0f) {
+
+            if (LTableResult3 == 0) {
+                ETableSub3 = "00";
+            }
+            else if (matrixHex3 == "01") {
+                ETableSub3 = multiplier3;
+            }
+            else if (LTableResult3 <= 0x09) {
                 LTableResultString3 = String.format("%02d", LTableResult3);
+                ETableSub3 = ETable.get(LTableResultString3);
+            }
+            else if (LTableResult3 >= 0x0a && LTableResult3 <= 0x0f) {
+                LTableResultString3 = sideCase(LTableResult3);
                 ETableSub3 = ETable.get(LTableResultString3);
             }
             else {
                 ETableSub3 = ETable.get(Integer.toHexString(LTableResult3));
             }
-            if (LTableResult4 <= 0x0f) {
+
+            if (LTableResult4 == 0) {
+                ETableSub4 = "00";
+            }
+            else if (matrixHex4 == "01") {
+                ETableSub4 = multiplier4;
+            }
+            else if (LTableResult4 <= 0x09) {
                 LTableResultString4 = String.format("%02d", LTableResult4);
+                ETableSub4 = ETable.get(LTableResultString4);
+            }
+            else if (LTableResult4 >= 0x0a && LTableResult4 <= 0x0f) {
+                LTableResultString4 = sideCase(LTableResult4);
                 ETableSub4 = ETable.get(LTableResultString4);
             }
             else {
@@ -395,6 +472,29 @@ public class AESDecryption {
         }
 
         return currentText;
+    }
+
+    public static String sideCase(Integer LTableResult) {
+        String LTableResultString = "";
+        if (LTableResult == 10) {
+            LTableResultString = "0a";
+        }
+        if (LTableResult == 11) {
+            LTableResultString = "0b";
+        }
+        if (LTableResult == 12) {
+            LTableResultString = "0c";
+        }
+        if (LTableResult == 13) {
+            LTableResultString = "0d";
+        }
+        if (LTableResult == 14) {
+            LTableResultString = "0e";
+        }
+        if (LTableResult == 15) {
+            LTableResultString = "0f";
+        }
+        return LTableResultString;
     }
 
 
