@@ -89,7 +89,7 @@ public class AESDecryption {
         }
     };
 
-    public static final int[][] multiplicationMatrix = {{0x0e, 0x0b, 0x0d, 0x09}, {0x09, 0x0e, 0x0b, 0x0d}, {0x0d, 0x09, 0x0e, 0x0b}, {0x0b, 0x0d, 0x09, 0x0e}};
+    public static final String[][] multiplicationMatrix = {{"0e", "0b", "0d", "09"}, {"09", "0e", "0b", "0d"}, {"0d", "09", "0e", "0b"}, {"0b", "0d", "09", "0e"}};
 
     public static void main(String[] args) {
 
@@ -104,7 +104,9 @@ public class AESDecryption {
         String[] currentText = plaintext;
         String[] currentkey = key;
         for (int i = 1; i <= 10; i++) {
-            currentText = xorString(arrayToString(currentText),arrayToString(currentkey));
+            if (i == 1) {
+                currentText = xorString(arrayToString(currentText), arrayToString(currentkey));
+            }
             System.out.println("round[" + i + "].istart: " + arrayToString(currentText));
             currentText = rowSubstitution(currentText);
             System.out.println("round[" + i + "].is_row: " + arrayToString(currentText));
@@ -114,7 +116,7 @@ public class AESDecryption {
             System.out.println("round[" + i + "].ik_sch: " + arrayToString(currentkey));
             currentText = xorString(arrayToString(currentText),arrayToString(currentkey));
             System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
-
+            currentText = columnMultiplication(currentText);
 //            if (i < 10) {
 //                currentText = columnMultiplication(currentText);
 //                System.out.println("round[" + i + "].ik_add: " + arrayToString(currentText));
@@ -187,7 +189,210 @@ public class AESDecryption {
     }
 
     private static String[] columnMultiplication(String[] currentText) {
+        String[] temp = Arrays.copyOf(currentText, 16);
+        for (int i = 0; i < 16; i++) {
+            String binary1 = "";
+            String binary2 = "";
+            String binary3 = "";
+            String binary4 = "";
+            String multiplier1 = "";
+            String multiplier2 = "";
+            String multiplier3 = "";
+            String multiplier4 = "";
+            // Setting the right multiplier for the multiplication matrix.
+            if (i % 4 == 0) {
+                multiplier1 = multiplicationMatrix[0][0];
+                multiplier2 = multiplicationMatrix[0][1];
+                multiplier3 = multiplicationMatrix[0][2];
+                multiplier4 = multiplicationMatrix[0][3];
+            }
+            else if (i % 4 == 1) {
+                multiplier1 = multiplicationMatrix[1][0];
+                multiplier2 = multiplicationMatrix[1][1];
+                multiplier3 = multiplicationMatrix[1][2];
+                multiplier4 = multiplicationMatrix[1][3];
+            }
+            else if (i % 4 == 2) {
+                multiplier1 = multiplicationMatrix[2][0];
+                multiplier2 = multiplicationMatrix[2][1];
+                multiplier3 = multiplicationMatrix[2][2];
+                multiplier4 = multiplicationMatrix[2][3];
+            }
+            else {
+                multiplier1 = multiplicationMatrix[3][0];
+                multiplier2 = multiplicationMatrix[3][1];
+                multiplier3 = multiplicationMatrix[3][2];
+                multiplier4 = multiplicationMatrix[3][3];
+            }
+            String matrixHex1 = "";
+            String matrixHex2 = "";
+            String matrixHex3 = "";
+            String matrixHex4 = "";
+            // Setting the number in the matrix that needs to be multiplied
+            if (i < 4) {
+                matrixHex1 = temp[0];
+                matrixHex2 = temp[1];
+                matrixHex3 = temp[2];
+                matrixHex4 = temp[3];
+            }
+            else if (i < 8) {
+                matrixHex1 = temp[4];
+                matrixHex2 = temp[5];
+                matrixHex3 = temp[6];
+                matrixHex4 = temp[7];
+            }
+            else if (i < 12) {
+                matrixHex1 = temp[8];
+                matrixHex2 = temp[9];
+                matrixHex3 = temp[10];
+                matrixHex4 = temp[11];
+            }
+            else {
+                matrixHex1 = temp[12];
+                matrixHex2 = temp[13];
+                matrixHex3 = temp[14];
+                matrixHex4 = temp[15];
+            }
 
+            int LTableResult1 = Integer.decode(String.format("0x%s", LTable.get(multiplier1))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex1)));
+            if (LTableResult1 > 0xff) {
+                LTableResult1 = LTableResult1 - 0xff;
+            }
+            int LTableResult2 = Integer.decode(String.format("0x%s", LTable.get(multiplier2))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex2)));
+            if (LTableResult2 > 0xff) {
+                LTableResult2 = LTableResult2 - 0xff;
+            }
+            int LTableResult3 = Integer.decode(String.format("0x%s", LTable.get(multiplier3))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex3)));
+            if (LTableResult3 > 0xff) {
+                LTableResult3 = LTableResult3 - 0xff;
+            }
+            int LTableResult4 = Integer.decode(String.format("0x%s", LTable.get(multiplier4))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex4)));
+            if (LTableResult4 > 0xff) {
+                LTableResult4 = LTableResult4 - 0xff;
+            }
+
+            String LTableResultString1 = "";
+            String ETableSub1 = "";
+            String LTableResultString2 = "";
+            String ETableSub2 = "";
+            String LTableResultString3 = "";
+            String ETableSub3 = "";
+            String LTableResultString4 = "";
+            String ETableSub4 = "";
+
+            if (LTableResult1 <= 0x0f) {
+                LTableResultString1 = String.format("%02d", LTableResult1);
+                ETableSub1 = ETable.get(LTableResultString1);
+            }
+            else {
+                ETableSub1 = ETable.get(Integer.toHexString(LTableResult1));
+            }
+            if (LTableResult2 <= 0x0f) {
+                LTableResultString2 = String.format("%02d", LTableResult2);
+                ETableSub2 = ETable.get(LTableResultString2);
+            }
+            else {
+                ETableSub2 = ETable.get(Integer.toHexString(LTableResult2));
+            }
+            if (LTableResult3 <= 0x0f) {
+                LTableResultString3 = String.format("%02d", LTableResult3);
+                ETableSub3 = ETable.get(LTableResultString3);
+            }
+            else {
+                ETableSub3 = ETable.get(Integer.toHexString(LTableResult3));
+            }
+            if (LTableResult4 <= 0x0f) {
+                LTableResultString4 = String.format("%02d", LTableResult4);
+                ETableSub4 = ETable.get(LTableResultString4);
+            }
+            else {
+                ETableSub4 = ETable.get(Integer.toHexString(LTableResult4));
+            }
+
+
+            binary1 = Integer.toBinaryString(Integer.decode(String.format("0x%s", ETableSub1)));
+            binary2 = Integer.toBinaryString(Integer.decode(String.format("0x%s", ETableSub2)));
+            binary3 = Integer.toBinaryString(Integer.decode(String.format("0x%s", ETableSub3)));
+            binary4 = Integer.toBinaryString(Integer.decode(String.format("0x%s", ETableSub4)));
+
+            // Adds on extra 0's in the front of the strings if it is less than 8 digits.
+            StringBuilder sb1 = new StringBuilder(binary1);
+            while (sb1.length() < 8) {
+                sb1.insert(0, "0");
+            }
+            binary1 = sb1.toString();
+
+            StringBuilder sb2 = new StringBuilder(binary2);
+            while (sb2.length() < 8) {
+                sb2.insert(0, "0");
+            }
+            binary2 = sb2.toString();
+
+            StringBuilder sb3 = new StringBuilder(binary3);
+            while (sb3.length() < 8) {
+                sb3.insert(0, "0");
+            }
+            binary3 = sb3.toString();
+
+            StringBuilder sb4 = new StringBuilder(binary4);
+            while (sb4.length() < 8) {
+                sb4.insert(0, "0");
+            }
+            binary4 = sb4.toString();
+
+            // Does the xor operation without the carry over bit.
+            StringBuilder binaryResult = new StringBuilder();
+            if ((binary1.charAt(0) + binary2.charAt(0) + binary3.charAt(0) + binary4.charAt(0)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(1) + binary2.charAt(1) + binary3.charAt(1) + binary4.charAt(1)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(2) + binary2.charAt(2) + binary3.charAt(2) + binary4.charAt(2)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(3) + binary2.charAt(3) + binary3.charAt(3) + binary4.charAt(3)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(4) + binary2.charAt(4) + binary3.charAt(4) + binary4.charAt(4)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(5) + binary2.charAt(5) + binary3.charAt(5) + binary4.charAt(5)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(6) + binary2.charAt(6) + binary3.charAt(6) + binary4.charAt(6)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            if ((binary1.charAt(7) + binary2.charAt(7) + binary3.charAt(7) + binary4.charAt(7)) % 2 == 0) {
+                binaryResult.append('0');
+            } else {
+                binaryResult.append('1');
+            }
+            // Converts the binary back to hex and stores it into the main array.
+            String finalBinaryResult = binaryResult.toString();
+            int decimal = Integer.parseInt(finalBinaryResult,2);
+            String hexString = Integer.toString(decimal,16);
+            if (hexString.length() == 1) {
+                StringBuilder sb = new StringBuilder(hexString);
+                sb.insert(0, "0");
+                hexString = sb.toString();
+            }
+            currentText[i] = hexString;
+        }
 
         return currentText;
     }
