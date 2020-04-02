@@ -4,7 +4,7 @@ import java.sql.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class AES {
+public class AESDecryption {
 
     public static final HashMap<String, String> sbox = new HashMap<String, String>() {
         {
@@ -30,7 +30,7 @@ public class AES {
     public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
 
     public static void main(String[] args) {
-        
+
         String[] plaintext = {"54", "77", "6f", "20", "4f", "6e", "65", "20", "4e", "69", "6e", "65", "20", "54", "77", "6f"};
         String[] key = {"54", "68", "61", "74", "73", "20", "6d", "79", "20", "4b", "75", "6e", "67", "20", "46", "75"};
 
