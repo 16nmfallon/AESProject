@@ -342,7 +342,7 @@ public class AESDecryption {
             if (LTableResult1 == 0) {
                 ETableSub1 = "00";
             }
-            else if (matrixHex1 == "01") {
+            else if (matrixHex1.equals("01")) {
                 ETableSub1 = multiplier1;
             }
             else if (LTableResult1 <= 0x09) {
@@ -360,7 +360,7 @@ public class AESDecryption {
             if (LTableResult2 == 0) {
                 ETableSub2 = "00";
             }
-            else if (matrixHex2 == "01") {
+            else if (matrixHex2.equals("01")) {
                 ETableSub2 = multiplier2;
             }
             else if (LTableResult2 <= 0x09) {
@@ -378,7 +378,7 @@ public class AESDecryption {
             if (LTableResult3 == 0) {
                 ETableSub3 = "00";
             }
-            else if (matrixHex3 == "01") {
+            else if (matrixHex3.equals("01")) {
                 ETableSub3 = multiplier3;
             }
             else if (LTableResult3 <= 0x09) {
@@ -396,7 +396,7 @@ public class AESDecryption {
             if (LTableResult4 == 0) {
                 ETableSub4 = "00";
             }
-            else if (matrixHex4 == "01") {
+            else if (matrixHex4.equals("01")) {
                 ETableSub4 = multiplier4;
             }
             else if (LTableResult4 <= 0x09) {
