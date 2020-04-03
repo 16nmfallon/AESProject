@@ -1,6 +1,7 @@
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class AESDecryption {
 
@@ -93,9 +94,22 @@ public class AESDecryption {
 
     public static void main(String[] args) {
 
-        String[] plaintext = {"69", "c4", "e0", "d8", "6a", "7b", "04", "30", "d8", "cd", "b7", "80", "70", "b4", "c5", "5a"};
-        String[] key = {"13", "11", "1d", "7f", "e3", "94", "4a", "17", "f3", "07", "a7", "8b", "4d", "2b", "30", "c5"};
+        System.out.println("DECRYPTION\n");
+        System.out.println("Enter Ciphertext (16 bytes): ");
+        Scanner in = new Scanner(System.in);
+        String inputtedPlaintext = in.nextLine();
+        System.out.println("Enter Key (16 bytes): ");
+        String inputtedKey = in.nextLine();
 
+        String plaintext[] = new String[16];   //  69c4e0d86a7b0430d8cdb78070b4c55a       f4351503aa781c520267d690c42d1f43
+        String key[] = new String[16];          // 13111d7fe3944a17f307a78b4d2b30c5       303132333435363738393a3b3c3d3e3f
+
+        int count = 0;
+        for (int j = 0; j < 16; j++) {
+            plaintext[j] = inputtedPlaintext.substring(count, count+2);
+            key[j] = inputtedKey.substring(count, count+2);
+            count = count + 2;
+        }
 
         String plaintextString = arrayToString(plaintext);
         String keyString = arrayToString(key);
@@ -124,11 +138,22 @@ public class AESDecryption {
             }
         }
 
-        System.out.println("round[10].output: " + arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey))));
+        String decrpytedText = arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey)));
 
+        System.out.println("round[10].output: " + decrpytedText);
 
+        System.out.println(hexToAscii(decrpytedText));
+    }
 
+    private static String hexToAscii(String hexStr) {
+        StringBuffer output = new StringBuffer("");
 
+        for (int i = 0; i < hexStr.length(); i += 2) {
+            String str = hexStr.substring(i, i + 2);
+            output.append((char) Integer.parseInt(str, 16));
+        }
+
+        return output.toString();
     }
 
     private static String arrayToString(String[] arr) {
@@ -259,7 +284,7 @@ public class AESDecryption {
             if (Integer.decode(String.format("0x%s", matrixHex1)) == 0) {
                 LTableResult1 = 0;
             } else if (Integer.decode(String.format("0x%s", matrixHex1)) == 1) {
-                LTableResult1 = Integer.decode(multiplier1);
+                LTableResult1 = Integer.decode(String.format("0x%s", matrixHex1));
             } else {
                 LTableResult1 = Integer.decode(String.format("0x%s", LTable.get(multiplier1))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex1)));
                 if (LTableResult1 > 0xff) {
@@ -271,7 +296,7 @@ public class AESDecryption {
             if (Integer.decode(String.format("0x%s", matrixHex2)) == 0) {
                 LTableResult2 = 0;
             } else if (Integer.decode(String.format("0x%s", matrixHex2)) == 1) {
-                LTableResult2 = Integer.decode(multiplier2);
+                LTableResult2 = Integer.decode(String.format("0x%s", matrixHex2));
             } else {
                 LTableResult2 = Integer.decode(String.format("0x%s", LTable.get(multiplier2))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex2)));
                 if (LTableResult2 > 0xff) {
@@ -283,7 +308,7 @@ public class AESDecryption {
             if (Integer.decode(String.format("0x%s", matrixHex3)) == 0) {
                 LTableResult3 = 0;
             } else if (Integer.decode(String.format("0x%s", matrixHex3)) == 1) {
-                LTableResult3 = Integer.decode(multiplier3);
+                LTableResult3 = Integer.decode(String.format("0x%s", matrixHex3));
             } else {
                 LTableResult3 = Integer.decode(String.format("0x%s", LTable.get(multiplier3))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex3)));
                 if (LTableResult3 > 0xff) {
@@ -295,7 +320,7 @@ public class AESDecryption {
             if (Integer.decode(String.format("0x%s", matrixHex4)) == 0) {
                 LTableResult4 = 0;
             } else if (Integer.decode(String.format("0x%s", matrixHex4)) == 1) {
-                LTableResult4 = Integer.decode(multiplier4);
+                LTableResult4 = Integer.decode(String.format("0x%s", matrixHex4));
             } else {
                 LTableResult4 = Integer.decode(String.format("0x%s", LTable.get(multiplier4))) + Integer.decode(String.format("0x%s", LTable.get(matrixHex4)));
                 if (LTableResult4 > 0xff) {

@@ -1,6 +1,7 @@
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class AESEncryption {
 
@@ -28,9 +29,22 @@ public class AESEncryption {
     public static final int[][] multiplicationMatrix = {{0x02, 0x03, 0x01, 0x01}, {0x01, 0x02, 0x03, 0x01}, {0x01, 0x01, 0x02, 0x03}, {0x03, 0x01, 0x01, 0x02}};
 
     public static void main(String[] args) {
-        String[] plaintext = {"00", "11", "22", "33", "44", "55", "66", "77", "88", "99", "aa", "bb", "cc", "dd", "ee", "ff"};
-        String[] key = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f"};
 
+        System.out.println("ENCRYPTION\n");
+        System.out.println("Enter Plaintext (16 bytes): ");
+        Scanner in = new Scanner(System.in);
+        String inputtedPlaintext = in.nextLine();
+        System.out.println("Enter Key (16 bytes): ");
+        String inputtedKey = in.nextLine();
+
+        String plaintext[] = new String[16];   // 00112233445566778899aabbccddeeff
+        String key[] = new String[16];          // 000102030405060708090a0b0c0d0e0f
+        int count = 0;
+        for (int j = 0; j < 16; j++) {
+            plaintext[j] = inputtedPlaintext.substring(count, count+2);
+            key[j] = inputtedKey.substring(count, count+2);
+            count = count + 2;
+        }
 
         String plaintextString = arrayToString(plaintext);
         String keyString = arrayToString(key);
@@ -54,9 +68,6 @@ public class AESEncryption {
         }
 
         System.out.println("round[10].output: " + arrayToString(xorString(arrayToString(currentText), arrayToString(currentkey))));
-
-
-
 
     }
 
